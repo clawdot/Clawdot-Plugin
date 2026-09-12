@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "clawdot-hub": {
+      "type": "http",
+      "url": "https://hub.clawdot.net/mcp"
+    }
+  }
+}
