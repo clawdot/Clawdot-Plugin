@@ -1,4 +1,4 @@
-# 工具参考（外卖点单连接器 · OAuth 版 · MCP 工具）
+# 工具参考（外卖点单 · 登录版 · MCP 工具）
 
 > 来源：`ClawDot-Hub/src/clawdot_hub/upstream_tools.delivery.json` + `upstream_tools.errand.json`（入参 schema，一 cap 一份）
 > + `annotations.delivery.json` + `annotations.errand.json`（暴露策略，同上）+ `contract.py`（hub 加的字段，仅外卖的金额闸相关）。
@@ -62,11 +62,11 @@
 
 | 工具 | 为什么禁 |
 |---|---|
-| `request_user_bind()` | 由 OAuth 授权链替代——登录这一步在 WorkBuddy 弹出的授权页里就做完了 |
+| `request_user_bind()` | 由 OAuth 授权链替代——登录在接入这一步就做完了（授权页上输手机号 + 验证码），不在对话里 |
 | `verify_user_bind()` | 由 OAuth 授权链替代 |
 | `get_user_auth_status()` | 授权是否有效由 hub 管；失效时业务调用会直接返回 `consent_required`，不需要单独查 |
-| `revoke_user_bind()` | 由 OAuth 的 `/revoke` 替代；用户要解绑在 WorkBuddy 连接器设置里操作，不在对话里 |
-| `get_homepage_url()` | 渠道级首页跳转，依赖渠道配置，对点单流程没有价值（与 token 版一致的禁用理由） |
+| `revoke_user_bind()` | 由 OAuth 的 `/revoke` 替代；解绑不在对话里做 |
+| `get_homepage_url()` | 渠道级首页跳转，依赖渠道配置，对点单流程没有价值 |
 
 ### 跑腿（4 个）
 

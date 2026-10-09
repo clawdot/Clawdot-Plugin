@@ -1,6 +1,6 @@
 # 错误码与重试策略（OAuth 版）
 
-> 外卖上游业务码来源：open-gateway `docs/外卖对外错误码.md`（同 token 版，37 个硬失败码的体系不变）。
+> 外卖上游业务码来源：open-gateway `docs/外卖对外错误码.md`（37 个硬失败码的体系不变）。
 > 跑腿业务码/行为来源：跑腿的工具说明原文——跑腿走独立的履约上游，
 > **不在**外卖那 37 个码的体系里，目前源文档里只点名了一个正式命名的码，其余是说明文字里点出的失败行为，见下面「跑腿（errand）相关码与行为」。
 > hub 自己的错误码来源：`ClawDot-Hub/src/clawdot_hub/contract.py`（`ErrorCode` + `GATE_RESULT_EXAMPLE`），这一层对外卖/跑腿通用。
@@ -15,7 +15,7 @@
 {"error": "consent_required"}
 ```
 只有两个取值会以这个形状出现：
-- `consent_required`：这次授权已经失效（比如用户换了账号重新登录、或在 WorkBuddy 里撤销了这个连接器的授权）。**如实告诉用户需要重新连接一次这个连接器，WorkBuddy 会自动引导去重新登录**——没有任何工具可以在对话里把这个问题解决掉，不要尝试猜或编造下一步。
+- `consent_required`：这次授权已经失效（比如用户换了账号重新登录，或撤销了这个连接的授权）。**如实告诉用户需要对这个连接重新授权一次**，怎么做见业务流程里的「鉴权模型」一节——没有任何工具可以在对话里把这个问题解决掉，不要尝试猜或编造下一步，也不要反复重试。
 - `upstream_error`：hub 连不上上游或协议错误，跟用户的操作无关。按下面「上游瞬时故障」的口径处理：读操作可退避重试一次，`preview_order()` / `create_order()` / `errand_quote()` / `errand_create()` / `errand_add_tip()` / `errand_cancel()` 不重试。
 
 **② hub 金额闸**（新，**只从外卖 `create_order()` 出现，跑腿没有**）——不在 `error` 字段里，是整个返回体：
@@ -41,7 +41,7 @@
 
 **跑腿 `errand_create()` / `errand_add_tip()` 不会返回这个形状**（D4：第一版最小闭环不为跑腿建金额闸对子）——金额只信 `errand_quote()` 的 `fee` 或调用方自己传的 `tip_fee`，下单/加小费前的显式确认必须你自己在对话里做完，不能指望服务端再拦一次。
 
-**③ 上游业务错误（透传，形状不变）**——同 token 版：
+**③ 上游业务错误（透传，形状不变）**：
 ```json
 {"error": {"code": "PUBLIC_REFERENCE_INVALID", "message": "…", "request_id": "req_xxx"}}
 ```
