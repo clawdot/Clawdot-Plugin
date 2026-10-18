@@ -1,6 +1,6 @@
 # ClawDot Hub · Claude Code 插件
 
-点外卖、叫跑腿：连的是任务接口（`/mcp/task`），外卖、跑腿两份说明书一起装。**登录授权即用，不用手填 API Key。**
+点外卖、叫跑腿、买日用百货：连的是任务接口（`/mcp/task`），外卖、跑腿、零售三份说明书一起装。**登录授权即用，不用手填 API Key。**
 
 ## 装
 
@@ -38,6 +38,7 @@ claude mcp remove clawdot-hub   # 手动加过的才要删；插件自带的那�
 | `.mcp.json` | 远程 MCP server `clawdot-task`（任务接口 `https://hub.clawdot.net/mcp/task`，OAuth 2.1） |
 | `skills/local-life-food/` | 点外卖怎么走：一单一个 task、什么算同意下单、改主意怎么回退、两单怎么确认、怎么问怎么摆 |
 | `skills/local-life-errand/` | 叫跑腿怎么走：同上的共用规则，加上挑运力、退单、查单看骑手 |
+| `skills/local-life-retail/` | 买日用百货怎么走：同上的共用规则，加上付没付以查到的为准、建单后改主意只能另开、退货退款 |
 
 工具本身由 server 提供，装插件不会把工具塞进你本地。
 

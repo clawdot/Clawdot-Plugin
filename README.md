@@ -16,11 +16,12 @@ clawdot-hub/                      插件本体
   .mcp.json                       远程 MCP server（插件根目录，不在 .claude-plugin/ 里）
   skills/local-life-food/         外卖说明书
   skills/local-life-errand/       跑腿说明书
+  skills/local-life-retail/       零售说明书
 ```
 
 ## skills/ 是生成物，别直接改
 
-`clawdot-hub/skills/` 下的两份是**生成物**：真源在我们内部仓的 `packages/task-skill/source/`
-（共用规则只写一份，按能力拼出外卖、跑腿两份），由脚本拼出、同步，门禁校验两边逐字节一致。
+`clawdot-hub/skills/` 下的三份是**生成物**：真源在我们内部仓的 `packages/task-skill/source/`
+（共用规则只写一份，按能力拼出外卖、跑腿、零售三份），由脚本拼出、同步，门禁校验两边逐字节一致。
 
 **所以别直接在这里改说明书** —— 下次发布会被覆盖掉。有问题提 issue。
