@@ -3,7 +3,7 @@ name: local-life-retail
 description: 帮用户买日用百货（零售），连的是带 create_task、retail_browse 的那组工具（先开 task，再一组一组往下走）时用。讲每一单怎么走、什么算同意下单、一笔只买一个规格、下单前改主意怎么回退、两单怎么确认、用户说付好了怎么办、金额变了怎么办、地址和手机号怎么说、退货退款怎么办。触发：买纸巾 / 买洗衣液 / 帮我买个 X（日用品、百货）/ 我买的东西到哪了 / 要退货、退款。
 description_zh: 登录就能用：搜商品、挑规格，按真实价格出确认页，你点头才建收款单、由你自己付款；能查付款和物流，也能退货退款。
 description_en: Sign in and buy daily essentials: search products and pick a spec, see the real price on a confirmation page; a payment link is created only after you confirm, and you pay it yourself; track payment and shipping, or request a refund.
-version: 0.2.0
+version: 0.1.0
 author: ClawDot
 ---
 

@@ -3,7 +3,7 @@ name: local-life-food
 description: 帮用户点外卖，连的是带 create_task、food_browse 的那组工具（先开 task，再一组一组往下走）时用。讲每一单怎么走、什么算同意下单、下单前改主意怎么回退、用户要另一家店的东西时是换店还是两单都要、两单怎么确认、地址默认哪个、搜店带不带关键词、规格怎么一句话确认、单点不送和起送怎么说。触发：点外卖 / 想吃 X / 来杯咖啡奶茶 / 饿了 / 随便来点 / 看看我的外卖单；已经加了购、用户又提到别家店时也要用。
 description_zh: 登录就能用：搜店、挑菜，规格一句话确认，按真实价格出确认页，你点头才下单；也能查外卖订单到哪了。
 description_en: Sign in and order food delivery: search shops, pick dishes, confirm specs in one line, see the real price on a confirmation page, and the order is placed only after you confirm; track your food orders.
-version: 0.2.0
+version: 0.1.0
 author: ClawDot
 ---
 
