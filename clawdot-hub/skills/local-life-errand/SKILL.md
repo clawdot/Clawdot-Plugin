@@ -3,7 +3,7 @@ name: local-life-errand
 description: 帮用户叫跑腿（同城取件、送件），连的是带 create_task、errand_address 的那组工具（先开 task，再一组一组往下走）时用。讲每一单怎么走、什么算同意下单、下单前改主意怎么回退、两单怎么确认、要退一单跑腿怎么办、查单和看骑手。触发：叫跑腿 / 帮我寄个 X / 帮我送个东西过去 / 帮我取个 X / 跑腿到哪了 / 骑手在哪 / 取消跑腿。
 description_zh: 登录就能用：帮你叫同城跑腿取件、送件，询价后挑运力，你点头才下单；能查进度、看骑手位置，也能取消。
 description_en: Sign in and book a same-city errand run: set pickup and drop-off, compare carriers by quote, and the order is placed only after you confirm; track progress, see the rider, or cancel.
-version: 0.1.0
+version: 0.2.0
 author: ClawDot
 ---
 

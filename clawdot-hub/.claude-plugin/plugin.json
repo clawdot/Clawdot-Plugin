@@ -1,7 +1,7 @@
 {
   "name": "clawdot-hub",
   "description": "本地生活任务接口：点外卖、叫跑腿、买日用百货，连接和说明书一起装。登录授权即用，不用手填 Key。",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "author": { "name": "ClawDot" },
   "homepage": "https://hub.clawdot.net"
 }
