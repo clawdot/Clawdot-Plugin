@@ -11,4 +11,4 @@
 | 换收货地址 | `food_address` · `select` | 店、购物车、确认页 |
 | 换一家店 | `food_browse` · `select` | 购物车、确认页 |
 | 搜别的店、回菜单、看规格 | `food_browse` · `search` / `menu` / `item` | 不清 |
-| 加一样、删一样、重新预览 | `food_cart` · `add` / `remove` / `preview` | 确认页 |
+| 加一样、改份数、删一样（份数填这款一共几份，再来一份 = 原份数 + 1，设成 0 就是删）、重新预览 | `food_cart` · `update` / `preview` | 确认页 |

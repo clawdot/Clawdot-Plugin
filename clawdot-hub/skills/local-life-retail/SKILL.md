@@ -2,8 +2,8 @@
 name: local-life-retail
 description: 用户要买日用百货（零售）时用，还没连上任务接口也用（正文开头讲怎么先帮用户连上）。讲每一单怎么走、什么算同意下单、一笔只买一个规格、下单前改主意怎么回退、两单怎么确认、用户说付好了怎么办、金额变了怎么办、地址和手机号怎么说、退货退款怎么办。触发：买纸巾 / 买洗衣液 / 帮我买个 X（日用品、百货）/ 我买的东西到哪了 / 要退货、退款。
 description_zh: 登录就能用：搜商品、挑规格，按真实价格出确认页，你点头才建收款单、由你自己付款；能查付款和物流，也能退货退款。
-description_en: Sign in and buy daily essentials: search products and pick a spec, see the real price on a confirmation page; a payment link is created only after you confirm, and you pay it yourself; track payment and shipping, or request a refund.
-version: 0.2.0
+description_en: "Sign in and buy daily essentials: search products and pick a spec, see the real price on a confirmation page; a payment link is created only after you confirm, and you pay it yourself; track payment and shipping, or request a refund."
+version: 0.2.2
 author: ClawDot
 ---
 
@@ -11,7 +11,7 @@ author: ClawDot
 
 ### 先连上任务接口
 
-这份说明配的是任务接口上的一组工具，由 `create_task` 起头。调不到 `create_task`，就是这个客户端还没连上任务接口：先停下来帮用户连上；没连上之前什么都查不到、也下不了单，不要自己编结果。各客户端的连法都一样：
+这份说明配的是任务接口上的一组工具，由 `create_task` 起头。先看工具列表里有没有 `create_task`（有的客户端要先搜工具才加载出来，先搜一次）：有，就是已经连上了，直接用，不要因为客户端里别的连接显示要授权就让用户去授权；搜了也调不到 `create_task`，才是这个客户端还没连上任务接口：先停下来帮用户连上；没连上之前什么都查不到、也下不了单，不要自己编结果。各客户端的连法都一样：
 
 - 任务接口的地址：https://hub.clawdot.net/mcp/task
 - 在客户端里添加一个远程 MCP 连接，地址填上面这个（各客户端在哪里添加，登录 https://hub.clawdot.net 后在「接入」里按平台查）。连接时会打开连接页：登录（或注册）开发者账号，选一个专用 agent（或新建一个），回到客户端就连上了。
@@ -27,6 +27,7 @@ author: ClawDot
 - 每一单先调 `create_task`，只带 `idempotency_key` 和 `context`，不用带 `capability`。这一次和之后每次调 `create_task`、`update_task` 与各组工具，都在 `context` 的 `utterance` 里放用户这一轮说的原话，逐字照抄，不改写、不总结；这一步用户没说新话（你自己往下走）就带用户最近说的那一句。
 - `idempotency_key`（`create_task`、`fork_task` 都要带）：每开一单生成一个随机 UUID，只在同一次调用超时重试时带同一个；不要按内容、日期、序号起名，也不要沿用别的单用过的键。
 - 刚开的 task 还没定办什么，返回里的 `next_action.summary` 列了各业务的第一步：买日用百货从 `retail_browse` · `search` 开始，退货退款从 `retail_aftersale` · `locate` 开始。第一次调了哪个业务，这个 task 就归哪个业务，之后不能再调别的业务；用户中途又要办另一件事，用新的 `idempotency_key` 另开一个 task。
+- 返回的 `next_action.tool` 是 `retail_authorize`，说明这位用户还没授权：照它调、`action` 用 `start`；回来要手机号就问用户一次，带在 `context.phone` 里再调 `start`，把拿到的授权链接原样发给用户；用户说做完了，同一个工具 `action` 用 `status`（只查、不重发），完成了就照它回的 `next_action` 往下走，没完成就把回来的话转给用户。办事中途任何一步回 consent_required，照返回的话走。
 - 之后照返回里的 `next_action.tool`、`next_action.action` 调，每次都带 `task_id`。`next_action.options` 原样摆给用户挑，用户挑中的那一项的 `ref` 原样回传，不改、不自己拼。
 - 要下单，用确认页那一项的 `ref` 当 `confirm_ref`，而且要等用户同意之后。什么算同意下单：
   - 只有用户**看过这张确认页的实付之后**、针对它说「下单 / 确认 / 就这样」才算同意。
@@ -78,3 +79,8 @@ author: ClawDot
 - 不说工具名、`task_id`、`ref` 这些；说商品名、规格、价钱。
 - 两单就说两单（「纸巾一单、洗衣液一单，分开付」），不要说成一单，也不要只报一个合计让用户以为只付一次。
 - 金额只用确认页上的实付，不自己估。
+
+## 9. 用户的记忆
+
+- 用户说「记住 / 忘掉 / 你记了我什么 / 给我个链接看看」，说的是下单用的口味、忌口、过敏、家人、常用地点：调 `memory` 工具（不挂 task），不要记进客户端自己的记忆或笔记。
+- 记过敏、家人要用户明确同意：用户只是顺口提到（「对了我对虾也过敏」），先问一句要不要记住，同意了才记。

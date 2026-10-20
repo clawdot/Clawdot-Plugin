@@ -1,9 +1,9 @@
 ---
 name: local-life-food
-description: 用户要点外卖时用，还没连上任务接口也用（正文开头讲怎么先帮用户连上）。讲每一单怎么走、什么算同意下单、下单前改主意怎么回退、用户要另一家店的东西时是换店还是两单都要、两单怎么确认、地址默认哪个、搜店带不带关键词、规格怎么一句话确认、单点不送和起送怎么说。触发：点外卖 / 想吃 X / 来杯咖啡奶茶 / 饿了 / 随便来点 / 看看我的外卖单；已经加了购、用户又提到别家店时也要用。
+description: 用户要点外卖时用，还没连上任务接口也用（正文开头讲怎么先帮用户连上）。讲每一单怎么走、什么算同意下单、下单前改主意怎么回退、用户要另一家店的东西时是换店还是两单都要、两单怎么确认、地址默认哪个、搜店带不带关键词、规格怎么一句话确认、单点不送和起送怎么说。触发：点外卖 / 想吃 X / 来杯咖啡奶茶 / 饿了 / 随便来点 / 看看我的外卖单 / 记住我的口味、忌口、过敏 / 你记了我什么；已经加了购、用户又提到别家店时也要用。
 description_zh: 登录就能用：搜店、挑菜，规格一句话确认，按真实价格出确认页，你点头才下单；也能查外卖订单到哪了。
-description_en: Sign in and order food delivery: search shops, pick dishes, confirm specs in one line, see the real price on a confirmation page, and the order is placed only after you confirm; track your food orders.
-version: 0.2.0
+description_en: "Sign in and order food delivery: search shops, pick dishes, confirm specs in one line, see the real price on a confirmation page, and the order is placed only after you confirm; track your food orders."
+version: 0.2.3
 author: ClawDot
 ---
 
@@ -11,7 +11,7 @@ author: ClawDot
 
 ### 先连上任务接口
 
-这份说明配的是任务接口上的一组工具，由 `create_task` 起头。调不到 `create_task`，就是这个客户端还没连上任务接口：先停下来帮用户连上；没连上之前什么都查不到、也下不了单，不要自己编结果。各客户端的连法都一样：
+这份说明配的是任务接口上的一组工具，由 `create_task` 起头。先看工具列表里有没有 `create_task`（有的客户端要先搜工具才加载出来，先搜一次）：有，就是已经连上了，直接用，不要因为客户端里别的连接显示要授权就让用户去授权；搜了也调不到 `create_task`，才是这个客户端还没连上任务接口：先停下来帮用户连上；没连上之前什么都查不到、也下不了单，不要自己编结果。各客户端的连法都一样：
 
 - 任务接口的地址：https://hub.clawdot.net/mcp/task
 - 在客户端里添加一个远程 MCP 连接，地址填上面这个（各客户端在哪里添加，登录 https://hub.clawdot.net 后在「接入」里按平台查）。连接时会打开连接页：登录（或注册）开发者账号，选一个专用 agent（或新建一个），回到客户端就连上了。
@@ -27,6 +27,7 @@ author: ClawDot
 - 每一单先调 `create_task`，只带 `idempotency_key` 和 `context`，不用带 `capability`。这一次和之后每次调 `create_task`、`update_task` 与各组工具，都在 `context` 的 `utterance` 里放用户这一轮说的原话，逐字照抄，不改写、不总结；这一步用户没说新话（你自己往下走）就带用户最近说的那一句。
 - `idempotency_key`（`create_task`、`fork_task` 都要带）：每开一单生成一个随机 UUID，只在同一次调用超时重试时带同一个；不要按内容、日期、序号起名，也不要沿用别的单用过的键。
 - 刚开的 task 还没定办什么，返回里的 `next_action.summary` 列了各业务的第一步：点外卖从 `food_address` · `search` 开始。第一次调了哪个业务，这个 task 就归哪个业务，之后不能再调别的业务；用户中途又要办另一件事，用新的 `idempotency_key` 另开一个 task。
+- 返回的 `next_action.tool` 是 `food_authorize`，说明这位用户还没授权：照它调、`action` 用 `start`；回来要手机号就问用户一次，带在 `context.phone` 里再调 `start`，把拿到的授权链接原样发给用户；用户说做完了，同一个工具 `action` 用 `status`（只查、不重发），完成了就照它回的 `next_action` 往下走，没完成就把回来的话转给用户。办事中途任何一步回 consent_required，照返回的话走。
 - 之后照返回里的 `next_action.tool`、`next_action.action` 调，每次都带 `task_id`。`next_action.options` 原样摆给用户挑，用户挑中的那一项的 `ref` 原样回传，不改、不自己拼。
 - 已经往后走了（选了店、加了购）又回头搜地址、搜店，只算「只是看看」：已选的东西一样不动，`next_action` 仍指着原来那一步（比如 `food_cart` · `preview`），搜到的候选不在 `next_action.options`，在 `result.candidates`。摆给用户看就好；用户要换，再拿其中一项的 `ref` 调 `select`，`summary` 里写了换了会清掉什么。重选同一个地址什么都不清。
 - 要下单，用确认页那一项的 `ref` 当 `confirm_ref`，而且要等用户同意之后。什么算同意下单：
@@ -47,7 +48,7 @@ author: ClawDot
 ## 3. 下单前改主意
 
 - 有两种回退，按用户的意思选：
-  - 只想改一项：在原 task 里重调定这一项的那一步，比如换地址重调 `food_address` · `select`，删一样用 `food_cart` · `remove`。不开新 task、不多计费。
+  - 只想改一项：在原 task 里重调定这一项的那一步，比如换地址重调 `food_address` · `select`，删一样用 `food_cart` · `update` 把那一行设成 0。不开新 task、不多计费。
   - 想留着现在这一版、另试一版（「先别动这个，再配一份看看」）：对原 task 调 `fork_task`，带新的 `idempotency_key`。新 task 带着地址、店和购物车里的东西，原 task 原样留着，之后哪一版都能接着走到下单。fork 会多计一次费；购物车里有加不回来的商品时返回里会列出来，要跟用户说一声。
 - 有的改动会清掉后面已经选好的东西，比如换店会清空购物车。哪一步清什么见 @references/rollback.md；会清掉用户已经挑好的东西时，先跟用户说清楚再调。
 - 下了单就回不去了：再要一单调 `create_task` 新开；「照上一单再来一份」用 `fork_task`。两个都要带这一单新的 `idempotency_key`，超时重试带同一个。还没开始办事的 task、下单结果不明的 task 不能 fork。
@@ -90,3 +91,8 @@ author: ClawDot
 - 不说工具名、`task_id`、`ref` 这些；说店名、菜名、价钱。
 - 两单就说两单（「A 店一单、B 店一单，分开付」），不要说成一单，也不要只报一个合计让用户以为只付一次。
 - 金额只用确认页上的实付，不自己估。
+
+## 8. 用户的记忆
+
+- 用户说「记住 / 忘掉 / 你记了我什么 / 给我个链接看看」，说的是下单用的口味、忌口、过敏、家人、常用地点：调 `memory` 工具（不挂 task），不要记进客户端自己的记忆或笔记。
+- 记过敏、家人要用户明确同意：用户只是顺口提到（「对了我对虾也过敏」），先问一句要不要记住，同意了才记。
