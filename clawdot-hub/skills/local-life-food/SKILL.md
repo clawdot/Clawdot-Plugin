@@ -1,20 +1,30 @@
 ---
 name: local-life-food
-description: 帮用户点外卖，连的是带 create_task、food_browse 的那组工具（先开 task，再一组一组往下走）时用。讲每一单怎么走、什么算同意下单、下单前改主意怎么回退、用户要另一家店的东西时是换店还是两单都要、两单怎么确认、地址默认哪个、搜店带不带关键词、规格怎么一句话确认、单点不送和起送怎么说。触发：点外卖 / 想吃 X / 来杯咖啡奶茶 / 饿了 / 随便来点 / 看看我的外卖单；已经加了购、用户又提到别家店时也要用。
+description: 用户要点外卖时用，还没连上任务接口也用（正文开头讲怎么先帮用户连上）。讲每一单怎么走、什么算同意下单、下单前改主意怎么回退、用户要另一家店的东西时是换店还是两单都要、两单怎么确认、地址默认哪个、搜店带不带关键词、规格怎么一句话确认、单点不送和起送怎么说。触发：点外卖 / 想吃 X / 来杯咖啡奶茶 / 饿了 / 随便来点 / 看看我的外卖单；已经加了购、用户又提到别家店时也要用。
 description_zh: 登录就能用：搜店、挑菜，规格一句话确认，按真实价格出确认页，你点头才下单；也能查外卖订单到哪了。
 description_en: Sign in and order food delivery: search shops, pick dishes, confirm specs in one line, see the real price on a confirmation page, and the order is placed only after you confirm; track your food orders.
-version: 0.1.0
+version: 0.2.0
 author: ClawDot
 ---
 
 # 本地生活任务（外卖）
+
+### 先连上任务接口
+
+这份说明配的是任务接口上的一组工具，由 `create_task` 起头。调不到 `create_task`，就是这个客户端还没连上任务接口：先停下来帮用户连上；没连上之前什么都查不到、也下不了单，不要自己编结果。各客户端的连法都一样：
+
+- 任务接口的地址：https://hub.clawdot.net/mcp/task
+- 在客户端里添加一个远程 MCP 连接，地址填上面这个（各客户端在哪里添加，登录 https://hub.clawdot.net 后在「接入」里按平台查）。连接时会打开连接页：登录（或注册）开发者账号，选一个专用 agent（或新建一个），回到客户端就连上了。
+- 客户端打不开浏览器（自建 agent、没有屏幕的设备）：走设备码授权，用户在任意一台能上网的设备上打开链接、输入码，同样登录开发者账号、选专用 agent；这条要先由虾点建档、拿到 client_id。
+- 自己的服务端对服务端接入：用 API Key 接任务接口，每个请求带上自己这边的用户编号；API Key 由虾点发放（在控制台申请）。
+- 连上以后工具列表里就有 `create_task` 了，照下面「怎么走」办。
 
 这组工具按「一单一个 task」走：先开 task，之后每一步都照返回里的下一步去调。
 每个参数什么意思、哪一步会被拒，工具说明和返回里都有，这里不重复；这里只讲工具判断不了、要你来判断的事：用户到底想要什么、几个 task 怎么记、对用户怎么说。
 
 ## 1. 怎么走
 
-- 每一单先调 `create_task`，只带 `idempotency_key`，不用带 `capability`。
+- 每一单先调 `create_task`，只带 `idempotency_key` 和 `context`，不用带 `capability`。这一次和之后每次调 `create_task`、`update_task` 与各组工具，都在 `context` 的 `utterance` 里放用户这一轮说的原话，逐字照抄，不改写、不总结；这一步用户没说新话（你自己往下走）就带用户最近说的那一句。
 - `idempotency_key`（`create_task`、`fork_task` 都要带）：每开一单生成一个随机 UUID，只在同一次调用超时重试时带同一个；不要按内容、日期、序号起名，也不要沿用别的单用过的键。
 - 刚开的 task 还没定办什么，返回里的 `next_action.summary` 列了各业务的第一步：点外卖从 `food_address` · `search` 开始。第一次调了哪个业务，这个 task 就归哪个业务，之后不能再调别的业务；用户中途又要办另一件事，用新的 `idempotency_key` 另开一个 task。
 - 之后照返回里的 `next_action.tool`、`next_action.action` 调，每次都带 `task_id`。`next_action.options` 原样摆给用户挑，用户挑中的那一项的 `ref` 原样回传，不改、不自己拼。
