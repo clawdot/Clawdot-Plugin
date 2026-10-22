@@ -3,7 +3,7 @@ name: local-life-food
 description: 用户要点外卖时用，还没连上任务接口也用（正文开头讲怎么先帮用户连上）。讲每一单怎么走、什么算同意下单、下单前改主意怎么回退、用户要另一家店的东西时是换店还是两单都要、两单怎么确认、地址默认哪个、搜店带不带关键词、规格怎么一句话确认、单点不送和起送怎么说。触发：点外卖 / 想吃 X / 来杯咖啡奶茶 / 饿了 / 随便来点 / 看看我的外卖单 / 记住我的口味、忌口、过敏 / 你记了我什么；已经加了购、用户又提到别家店时也要用。
 description_zh: 登录就能用：搜店、挑菜，规格一句话确认，按真实价格出确认页，你点头才下单；也能查外卖订单到哪了。
 description_en: "Sign in and order food delivery: search shops, pick dishes, confirm specs in one line, see the real price on a confirmation page, and the order is placed only after you confirm; track your food orders."
-version: 0.2.3
+version: 0.2.4
 author: ClawDot
 ---
 
@@ -49,7 +49,7 @@ author: ClawDot
 
 - 有两种回退，按用户的意思选：
   - 只想改一项：在原 task 里重调定这一项的那一步，比如换地址重调 `food_address` · `select`，删一样用 `food_cart` · `update` 把那一行设成 0。不开新 task、不多计费。
-  - 想留着现在这一版、另试一版（「先别动这个，再配一份看看」）：对原 task 调 `fork_task`，带新的 `idempotency_key`。新 task 带着地址、店和购物车里的东西，原 task 原样留着，之后哪一版都能接着走到下单。fork 会多计一次费；购物车里有加不回来的商品时返回里会列出来，要跟用户说一声。
+  - 想留着现在这一版、另试一版（「先别动这个，再配一份看看」）：对原 task 调 `fork_task`，带新的 `idempotency_key`。新 task 带着地址、店和购物车里的东西，原 task 原样留着，之后哪一版都能接着走到下单。fork 会多计一次费；购物车里有加不回来的商品时返回里会列出来，要跟用户说一声。fork 回来的 `result.fork.dropped` 列着没带过去的几项：按新 task 的 `next_action` 重拉那几步的候选，不要拿旧 task 里的句柄去调。
 - 有的改动会清掉后面已经选好的东西，比如换店会清空购物车。哪一步清什么见 @references/rollback.md；会清掉用户已经挑好的东西时，先跟用户说清楚再调。
 - 下了单就回不去了：再要一单调 `create_task` 新开；「照上一单再来一份」用 `fork_task`。两个都要带这一单新的 `idempotency_key`，超时重试带同一个。还没开始办事的 task、下单结果不明的 task 不能 fork。
 

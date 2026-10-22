@@ -3,7 +3,7 @@ name: local-life-retail
 description: 用户要买日用百货（零售）时用，还没连上任务接口也用（正文开头讲怎么先帮用户连上）。讲每一单怎么走、什么算同意下单、一笔只买一个规格、下单前改主意怎么回退、两单怎么确认、用户说付好了怎么办、金额变了怎么办、地址和手机号怎么说、退货退款怎么办。触发：买纸巾 / 买洗衣液 / 帮我买个 X（日用品、百货）/ 我买的东西到哪了 / 要退货、退款。
 description_zh: 登录就能用：搜商品、挑规格，按真实价格出确认页，你点头才建收款单、由你自己付款；能查付款和物流，也能退货退款。
 description_en: "Sign in and buy daily essentials: search products and pick a spec, see the real price on a confirmation page; a payment link is created only after you confirm, and you pay it yourself; track payment and shipping, or request a refund."
-version: 0.2.2
+version: 0.2.3
 author: ClawDot
 ---
 
@@ -42,13 +42,13 @@ author: ClawDot
 ## 2. 一个 task = 一样商品 = 一单
 
 - 一个 task 只买一个规格（同一个规格可以买几件），最后只成一单。两样商品就是两个 task、两单、两次付款。
-- 每开一个 task 都算一次费。不要为了「先看看」去开 task。
+- 每开一个 task 都算一次费。不要为了「先看看」去开 task；比较几件商品就在同一个 task 里对它们各调一次 `retail_browse` · `item`，再 `select` 其中一件的规格（这次搜索以来看过的都认，重新 `search` 之后就不认了）。
 
 ## 3. 下单前改主意
 
 - 有两种回退，按用户的意思选：
   - 只想改一项：在原 task 里重调定这一项的那一步，比如换规格先用 `retail_browse` · `remove` 清掉再选，改数量重调 `retail_browse` · `select`，换地址重调 `retail_address` · `select`。不开新 task、不多计费。
-  - 想留着现在这一版、另试一版（「先别动这个，再配一份看看」）：对原 task 调 `fork_task`，带新的 `idempotency_key`。新 task 带着商品、规格、数量和收货地址，原 task 原样留着，之后哪一版都能接着走到下单。fork 会多计一次费；确认页不带过去，新 task 里要重新预览。
+  - 想留着现在这一版、另试一版（「先别动这个，再配一份看看」）：对原 task 调 `fork_task`，带新的 `idempotency_key`。新 task 带着商品、规格、数量和收货地址，原 task 原样留着，之后哪一版都能接着走到下单。fork 会多计一次费；确认页不带过去，新 task 里要重新预览。fork 回来的 `result.fork.dropped` 列着没带过去的几项：按新 task 的 `next_action` 重拉那几步的候选，不要拿旧 task 里的句柄去调。
 - 有的改动会清掉后面已经选好的东西，比如换规格、换地址都会让确认页作废。哪一步清什么见 @references/rollback.md；会清掉用户已经挑好的东西时，先跟用户说清楚再调。
 - 下了单就回不去了：再要一单调 `create_task` 新开；「照上一单再来一份」用 `fork_task`。两个都要带这一单新的 `idempotency_key`，超时重试带同一个。还没开始办事的 task、下单结果不明的 task 不能 fork。
 

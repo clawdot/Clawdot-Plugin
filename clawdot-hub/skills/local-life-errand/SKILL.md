@@ -3,7 +3,7 @@ name: local-life-errand
 description: 用户要叫跑腿（同城取件、送件）时用，还没连上任务接口也用（正文开头讲怎么先帮用户连上）。讲每一单怎么走、什么算同意下单、下单前改主意怎么回退、两单怎么确认、要退一单跑腿怎么办、查单和看骑手。触发：叫跑腿 / 帮我寄个 X / 帮我送个东西过去 / 帮我取个 X / 跑腿到哪了 / 骑手在哪 / 取消跑腿。
 description_zh: 登录就能用：帮你叫同城跑腿取件、送件，询价后挑运力，你点头才下单；能查进度、看骑手位置，也能取消。
 description_en: "Sign in and book a same-city errand run: set pickup and drop-off, compare carriers by quote, and the order is placed only after you confirm; track progress, see the rider, or cancel."
-version: 0.2.2
+version: 0.2.3
 author: ClawDot
 ---
 
@@ -49,7 +49,7 @@ author: ClawDot
 
 - 有两种回退，按用户的意思选：
   - 只想改一项：在原 task 里重调定这一项的那一步，比如换取件或送达地址重调 `errand_address` · `select`，改物品重调 `errand_goods` · `quote`。不开新 task、不多计费。
-  - 想留着现在这一版、另试一版（「先别动这个，再配一份看看」）：对原 task 调 `fork_task`，带新的 `idempotency_key`。新 task 带着两端地址，原 task 原样留着，之后哪一版都能接着走到下单。fork 会多计一次费；报价不带过去，新 task 里要重新询价。
+  - 想留着现在这一版、另试一版（「先别动这个，再配一份看看」）：对原 task 调 `fork_task`，带新的 `idempotency_key`。新 task 带着两端地址和品类（旧 task 的品类句柄照样能用），原 task 原样留着，之后哪一版都能接着走到下单。fork 会多计一次费；时段和报价不带过去，新 task 里要重说物品、重新询价。fork 回来的 `result.fork.dropped` 列着没带过去的几项：按新 task 的 `next_action` 重拉那几步的候选，不要拿旧 task 里的句柄去调。
 - 有的改动会清掉后面已经选好的东西，比如换地址会清掉报价。哪一步清什么见 @references/rollback.md；会清掉用户已经挑好的东西时，先跟用户说清楚再调。
 - 下了单就回不去了：再要一单调 `create_task` 新开；「照上一单再来一份」用 `fork_task`。两个都要带这一单新的 `idempotency_key`，超时重试带同一个。还没开始办事的 task、下单结果不明的 task 不能 fork。
 
