@@ -3,7 +3,7 @@ name: local-life-errand
 description: 用户要叫跑腿（同城取件、送件）时用，还没连上任务接口也用（正文开头讲怎么先帮用户连上）。讲每一单怎么走、什么算同意下单、下单前改主意怎么回退、两单怎么确认、要退一单跑腿怎么办、查单和看骑手。触发：叫跑腿 / 帮我寄个 X / 帮我送个东西过去 / 帮我取个 X / 跑腿到哪了 / 骑手在哪 / 取消跑腿。
 description_zh: 登录就能用：帮你叫同城跑腿取件、送件，询价后挑运力，你点头才下单；能查进度、看骑手位置，也能取消。
 description_en: "Sign in and book a same-city errand run: set pickup and drop-off, compare carriers by quote, and the order is placed only after you confirm; track progress, see the rider, or cancel."
-version: 0.2.3
+version: 0.2.4
 author: ClawDot
 ---
 
@@ -28,7 +28,7 @@ author: ClawDot
 - `idempotency_key`（`create_task`、`fork_task` 都要带）：每开一单生成一个随机 UUID，只在同一次调用超时重试时带同一个；不要按内容、日期、序号起名，也不要沿用别的单用过的键。
 - 刚开的 task 还没定办什么，返回里的 `next_action.summary` 列了各业务的第一步：叫跑腿从 `errand_address` · `search` 开始。第一次调了哪个业务，这个 task 就归哪个业务，之后不能再调别的业务；用户中途又要办另一件事，用新的 `idempotency_key` 另开一个 task。
 - 返回的 `next_action.tool` 是 `errand_authorize`，说明这位用户还没授权：照它调、`action` 用 `start`；回来要手机号就问用户一次，带在 `context.phone` 里再调 `start`，把拿到的授权链接原样发给用户；用户说做完了，同一个工具 `action` 用 `status`（只查、不重发），完成了就照它回的 `next_action` 往下走，没完成就把回来的话转给用户。办事中途任何一步回 consent_required，照返回的话走。
-- 之后照返回里的 `next_action.tool`、`next_action.action` 调，每次都带 `task_id`。`next_action.options` 原样摆给用户挑，用户挑中的那一项的 `ref` 原样回传，不改、不自己拼。
+- 之后照返回里的 `next_action.tool`、`next_action.action` 调，每次都带 `task_id`：从最近一次返回里原样复制，不凭记忆重打；回「抄错了」或「找不到这个 task」时先逐字核对 id，不要换着 id 重试，也不要为此新建 task。`next_action.options` 原样摆给用户挑，用户挑中的那一项的 `ref` 原样回传，不改、不自己拼。
 - 已经往后走了（询了价）又回头搜地址，只算「只是看看」：已选的东西一样不动，`next_action` 仍指着原来那一步（比如 `errand_goods` · `choose`），搜到的候选不在 `next_action.options`，在 `result.candidates`。摆给用户看就好；用户要换，再拿其中一项的 `ref` 调 `select`，`summary` 里写了换了会清掉什么。重选同一个地址什么都不清。
 - 要下单，用确认页那一项的 `ref` 当 `confirm_ref`，而且要等用户同意之后。什么算同意下单：
   - 只有用户**看过这张确认页的实付之后**、针对它说「下单 / 确认 / 就这样」才算同意。

@@ -3,7 +3,7 @@ name: local-life-retail
 description: 用户要买日用百货（零售）时用，还没连上任务接口也用（正文开头讲怎么先帮用户连上）。讲每一单怎么走、什么算同意下单、一笔只买一个规格、下单前改主意怎么回退、两单怎么确认、用户说付好了怎么办、金额变了怎么办、地址和手机号怎么说、退货退款怎么办。触发：买纸巾 / 买洗衣液 / 帮我买个 X（日用品、百货）/ 我买的东西到哪了 / 要退货、退款。
 description_zh: 登录就能用：搜商品、挑规格，按真实价格出确认页，你点头才建收款单、由你自己付款；能查付款和物流，也能退货退款。
 description_en: "Sign in and buy daily essentials: search products and pick a spec, see the real price on a confirmation page; a payment link is created only after you confirm, and you pay it yourself; track payment and shipping, or request a refund."
-version: 0.2.3
+version: 0.2.4
 author: ClawDot
 ---
 
@@ -28,7 +28,7 @@ author: ClawDot
 - `idempotency_key`（`create_task`、`fork_task` 都要带）：每开一单生成一个随机 UUID，只在同一次调用超时重试时带同一个；不要按内容、日期、序号起名，也不要沿用别的单用过的键。
 - 刚开的 task 还没定办什么，返回里的 `next_action.summary` 列了各业务的第一步：买日用百货从 `retail_browse` · `search` 开始，退货退款从 `retail_aftersale` · `locate` 开始。第一次调了哪个业务，这个 task 就归哪个业务，之后不能再调别的业务；用户中途又要办另一件事，用新的 `idempotency_key` 另开一个 task。
 - 返回的 `next_action.tool` 是 `retail_authorize`，说明这位用户还没授权：照它调、`action` 用 `start`；回来要手机号就问用户一次，带在 `context.phone` 里再调 `start`，把拿到的授权链接原样发给用户；用户说做完了，同一个工具 `action` 用 `status`（只查、不重发），完成了就照它回的 `next_action` 往下走，没完成就把回来的话转给用户。办事中途任何一步回 consent_required，照返回的话走。
-- 之后照返回里的 `next_action.tool`、`next_action.action` 调，每次都带 `task_id`。`next_action.options` 原样摆给用户挑，用户挑中的那一项的 `ref` 原样回传，不改、不自己拼。
+- 之后照返回里的 `next_action.tool`、`next_action.action` 调，每次都带 `task_id`：从最近一次返回里原样复制，不凭记忆重打；回「抄错了」或「找不到这个 task」时先逐字核对 id，不要换着 id 重试，也不要为此新建 task。`next_action.options` 原样摆给用户挑，用户挑中的那一项的 `ref` 原样回传，不改、不自己拼。
 - 要下单，用确认页那一项的 `ref` 当 `confirm_ref`，而且要等用户同意之后。什么算同意下单：
   - 只有用户**看过这张确认页的实付之后**、针对它说「下单 / 确认 / 就这样」才算同意。
   - 在确认页出来之前说的「结算 / 买单 / 下单吧」，只表示「出确认页给我看」：调 `retail_checkout` · `preview` 之后，先把商品、规格、数量、收货地址、实付摆给用户，问一句「确认下单吗？」，等用户回复再调 `retail_place_order`。
