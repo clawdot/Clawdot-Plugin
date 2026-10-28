@@ -3,7 +3,7 @@ name: local-life-food
 description: 用户要点外卖时用，还没连上任务接口也用（正文开头讲怎么先帮用户连上）。讲每一单怎么走、什么算同意下单、下单前改主意怎么回退、用户要另一家店的东西时是换店还是两单都要、两单怎么确认、地址默认哪个、搜店带不带关键词、规格怎么一句话确认、单点不送和起送怎么说。触发：点外卖 / 想吃 X / 来杯咖啡奶茶 / 饿了 / 随便来点 / 看看我的外卖单 / 记住我的口味、忌口、过敏 / 你记了我什么；已经加了购、用户又提到别家店时也要用。
 description_zh: 登录就能用：搜店、挑菜，规格一句话确认，按真实价格出确认页，你点头才下单；也能查外卖订单到哪了。
 description_en: "Sign in and order food delivery: search shops, pick dishes, confirm specs in one line, see the real price on a confirmation page, and the order is placed only after you confirm; track your food orders."
-version: 0.2.5
+version: 0.2.8
 author: ClawDot
 ---
 
@@ -16,7 +16,7 @@ author: ClawDot
 - 任务接口的地址：https://hub.clawdot.net/mcp/task
 - 在客户端里添加一个远程 MCP 连接，地址填上面这个（各客户端在哪里添加，登录 https://hub.clawdot.net 后在「接入」里按平台查）。连接时会打开连接页：登录（或注册）开发者账号，选一个专用 agent（或新建一个），回到客户端就连上了。
 - 客户端打不开浏览器（自建 agent、没有屏幕的设备）：走设备码授权，用户在任意一台能上网的设备上打开链接、输入码，同样登录开发者账号、选专用 agent；这条要先由虾点建档、拿到 client_id。
-- 自己的服务端对服务端接入：用 API Key 接任务接口，每个请求带上自己这边的用户编号；API Key 由虾点发放（在控制台申请）。
+- 自己的服务端对服务端接入：用 API Key 接任务接口，每个请求带上自己这边的用户编号；API Key 由超级 Agent / 平台版开发者在控制台「我的密钥」自助生成。
 - 连上以后工具列表里就有 `create_task` 了，照下面「怎么走」办。
 
 这组工具按「一单一个 task」走：先开 task，之后每一步都照返回里的下一步去调。

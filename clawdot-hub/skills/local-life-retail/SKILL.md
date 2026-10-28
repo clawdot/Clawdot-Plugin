@@ -3,7 +3,7 @@ name: local-life-retail
 description: 用户要买日用百货（零售）时用，还没连上任务接口也用（正文开头讲怎么先帮用户连上）。讲每一单怎么走、什么算同意下单、一笔只买一个规格、下单前改主意怎么回退、两单怎么确认、用户说付好了怎么办、金额变了怎么办、地址和手机号怎么说、退货退款怎么办。触发：买纸巾 / 买洗衣液 / 帮我买个 X（日用品、百货）/ 我买的东西到哪了 / 要退货、退款。
 description_zh: 登录就能用：搜商品、挑规格，按真实价格出确认页，你点头才建收款单、由你自己付款；能查付款和物流，也能退货退款。
 description_en: "Sign in and buy daily essentials: search products and pick a spec, see the real price on a confirmation page; a payment link is created only after you confirm, and you pay it yourself; track payment and shipping, or request a refund."
-version: 0.2.4
+version: 0.2.7
 author: ClawDot
 ---
 
@@ -16,7 +16,7 @@ author: ClawDot
 - 任务接口的地址：https://hub.clawdot.net/mcp/task
 - 在客户端里添加一个远程 MCP 连接，地址填上面这个（各客户端在哪里添加，登录 https://hub.clawdot.net 后在「接入」里按平台查）。连接时会打开连接页：登录（或注册）开发者账号，选一个专用 agent（或新建一个），回到客户端就连上了。
 - 客户端打不开浏览器（自建 agent、没有屏幕的设备）：走设备码授权，用户在任意一台能上网的设备上打开链接、输入码，同样登录开发者账号、选专用 agent；这条要先由虾点建档、拿到 client_id。
-- 自己的服务端对服务端接入：用 API Key 接任务接口，每个请求带上自己这边的用户编号；API Key 由虾点发放（在控制台申请）。
+- 自己的服务端对服务端接入：用 API Key 接任务接口，每个请求带上自己这边的用户编号；API Key 由超级 Agent / 平台版开发者在控制台「我的密钥」自助生成。
 - 连上以后工具列表里就有 `create_task` 了，照下面「怎么走」办。
 
 这组工具按「一单一个 task」走：先开 task，之后每一步都照返回里的下一步去调。
@@ -42,7 +42,7 @@ author: ClawDot
 ## 2. 一个 task = 一样商品 = 一单
 
 - 一个 task 只买一个规格（同一个规格可以买几件），最后只成一单。两样商品就是两个 task、两单、两次付款。
-- 每开一个 task 都算一次费。不要为了「先看看」去开 task；比较几件商品就在同一个 task 里对它们各调一次 `retail_browse` · `item`，再 `select` 其中一件的规格（这次搜索以来看过的都认，重新 `search` 之后就不认了）。
+- 每开一个 task 都算一次费。不要为了「先看看」去开 task；比较几件商品就在同一个 task 里对它们各调一次 `retail_browse` · `item`，再 `select` 其中一件的规格（这次搜索以来看过的都认，同样的条件翻页也算这次搜索、前面页的商品照认；换了关键词或别的条件重新 `search` 之后就不认了）。
 
 ## 3. 下单前改主意
 
