@@ -3,7 +3,7 @@ name: local-life-errand
 description: 用户要叫跑腿（同城取件、送件）时用，还没连上任务接口也用（正文开头讲怎么先帮用户连上）。讲每一单怎么走、什么算同意下单、下单前改主意怎么回退、两单怎么确认、要退一单跑腿怎么办、查单和看骑手。触发：叫跑腿 / 帮我寄个 X / 帮我送个东西过去 / 帮我取个 X / 跑腿到哪了 / 骑手在哪 / 取消跑腿。
 description_zh: 登录就能用：帮你叫同城跑腿取件、送件，询价后挑运力，你点头才下单；能查进度、看骑手位置，也能取消。
 description_en: "Sign in and book a same-city errand run: set pickup and drop-off, compare carriers by quote, and the order is placed only after you confirm; track progress, see the rider, or cancel."
-version: 0.2.6
+version: 0.2.8
 author: ClawDot
 ---
 
@@ -36,9 +36,13 @@ author: ClawDot
   - 「继续」「往下走」「你直接帮我选」都不算同意下单。
   - 用户回的是问题或别的事，先答，再问一次要不要下单。
 
+- 要用户付款时（下单之后，或查单时这单还没付）：客户端能显示图片，就把返回里 pay_qr_url 那张付款二维码图片显示给用户、让用户用手机扫码付；不能显示图片或它是空的，就把 pay_url 原样发给用户。
+
 - 用户要退一单跑腿：这单是在当前 task 里下的，就在这个 task 里调 `errand_fulfillment` · `pre_cancel`。不是的（新开的对话、别处下的单），新开一个 task，带上订单号 `order_id` 调 `errand_fulfillment` · `pre_cancel`，之后照返回往下走。被拒、说这单在另一个 task 里时，返回带着那个 task 的 `holder_task_id`，到那个 task 里办。
 
 - 用户问订单（「看看我之前的单」「上一单到哪了」），任何时候都能查，不用管 task 走到哪一步：在手头的 task 里（刚开的也行）调 `errand_fulfillment` · `list` 列最近的单，要看某一单就带它的 `order_id` 调 `status`（看骑手调 `rider`）。查单不会清掉已选的东西，查完接着原来那一步走。
+
+- 用户问骑手在哪：调 `errand_fulfillment` 的 `status` 和 `rider`，先说订单状态和位置更新时间。不要把经纬度念给用户（用户明确要坐标时才原样给），也不要把坐标猜成地名、距离或送达时间。`rider` 没有返回位置时，说暂时还没有骑手位置；`rider` 报错说没有骑手时，按订单状态说还没派到骑手，或这单已结束、看不到骑手位置了。用户问一次查一次，不要自己反复查，也不要答应帮用户盯着。
 
 ## 2. 一个 task = 一趟跑腿 = 一单
 
@@ -67,5 +71,7 @@ author: ClawDot
 
 ## 6. 用户的记忆
 
-- 用户说「记住 / 忘掉 / 你记了我什么 / 给我个链接看看」，说的是下单用的口味、忌口、过敏、家人、常用地点：调 `memory` 工具（不挂 task），不要记进客户端自己的记忆或笔记。
+- 用户说「记住 / 忘掉」，说的是下单用的口味、忌口、过敏、家人、常用地点：调 `memory` 工具（不挂 task），不要记进客户端自己的记忆或笔记。
+- 用户说「别记我 / 别再记了」：`memory` 的 `forget` 带 `stop` 为 true（已有的留着、不再用）；要连已有的一起删，再带 `all` 为 true。之后照结果里的说明告诉用户怎么恢复。
+- 用户问「你记了我什么」：凭你自己在对话里知道的回答，`memory` 工具不提供查询。要看、改、删全部记录，请用户重新授权一次，在授权完成那一页打开「我的记忆」。
 - 记过敏、家人要用户明确同意：用户只是顺口提到（「对了我对虾也过敏」），先问一句要不要记住，同意了才记。
