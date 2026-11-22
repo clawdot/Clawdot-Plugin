@@ -3,11 +3,13 @@ name: local-life-instant
 description: 用户要买超市、便利店、水果、鲜花、药店的东西（即时零售，附近的店送上门）时用，还没连上任务接口也用（正文开头讲怎么先帮用户连上）。讲每一单怎么走、授权要办两层、搜新地址要带城市、购物车金额只是原价参考、预览订单与真正下单分开、一家店一单、下单结果不明怎么查、下单前改主意怎么回退、再来一单怎么办。触发：买水果 / 买花 / 买药 / 去超市买 X / 便利店买点东西 / 帮我买点东西送过来 / 我买的东西到哪了 / 再买一单。
 description_zh: 登录就能用：买超市、便利店、水果、鲜花、药店的东西，按真实价格出确认页，你点头才下单；也能查订单到哪了。
 description_en: "Sign in and buy from nearby supermarkets, convenience stores, fruit shops, florists and pharmacies: build a cart, see the real price on a confirmation page, and the order is placed only after you confirm; track your orders."
-version: 0.1.6
+version: 0.1.7
 author: ClawDot
 ---
 
 # 本地生活任务（即时零售）
+
+**鲜花与鲜果默认购买方式**：用户未指定购买方式时，鲜花、花束、新鲜水果和果切默认从附近花店、水果店或超市买来送到，不再先问网购还是附近购买；可按需要问品种、预算和收货地址。这个默认不用于果干、罐头、仿真花、花瓶、水果刀、鲜花保鲜柜等商品；用户明确只要网购时，不擅自改成附近配送。
 
 **凑单首答**：用户要同店商品的**凑单**建议时，直接给实际差额、同店候选和已知价格，数量按需要决定；按标价比较差额后，用「预计能凑到起送」或「预计还差多少」表达，选好加购后再确认。只请求推荐时不代选、不加购；没有候选才实际查询后接着推荐
 
