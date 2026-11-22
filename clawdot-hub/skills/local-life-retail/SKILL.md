@@ -3,7 +3,7 @@ name: local-life-retail
 description: 用户要买日用百货（零售）时用，还没连上任务接口也用（正文开头讲怎么先帮用户连上）。讲每一单怎么走、什么算同意下单、一笔只买一个规格、下单前改主意怎么回退、两单怎么确认、用户说付好了怎么办、金额变了怎么办、地址和手机号怎么说、退货退款怎么办。触发：买纸巾 / 买洗衣液 / 帮我买个 X（日用品、百货）/ 我买的东西到哪了 / 要退货、退款。
 description_zh: 登录就能用：搜商品、挑规格，按真实价格出确认页，你点头才建收款单、由你自己付款；能查付款和物流，也能退货退款。
 description_en: "Sign in and buy daily essentials: search products and pick a spec, see the real price on a confirmation page; a payment link is created only after you confirm, and you pay it yourself; track payment and shipping, or request a refund."
-version: 0.2.7
+version: 0.2.8
 author: ClawDot
 ---
 
@@ -82,7 +82,4 @@ author: ClawDot
 
 ## 9. 用户的记忆
 
-- 用户说「记住 / 忘掉」，说的是下单用的口味、忌口、过敏、家人、常用地点：调 `memory` 工具（不挂 task），不要记进客户端自己的记忆或笔记。
-- 用户说「别记我 / 别再记了」：`memory` 的 `forget` 带 `stop` 为 true（已有的留着、不再用）；要连已有的一起删，再带 `all` 为 true。之后照结果里的说明告诉用户怎么恢复。
-- 用户问「你记了我什么」：凭你自己在对话里知道的回答，`memory` 工具不提供查询。要看、改、删全部记录，请用户重新授权一次，在授权完成那一页打开「我的记忆」。
-- 记过敏、家人要用户明确同意：用户只是顺口提到（「对了我对虾也过敏」），先问一句要不要记住，同意了才记。
+- 这条接入不带记忆；用户让你记住口味、忌口或过敏时，如实说这里记不住，请他下单时直接说

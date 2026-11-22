@@ -3,7 +3,7 @@ name: local-life-errand
 description: 用户要叫跑腿（同城取件、送件）时用，还没连上任务接口也用（正文开头讲怎么先帮用户连上）。讲每一单怎么走、什么算同意下单、下单前改主意怎么回退、两单怎么确认、要退一单跑腿怎么办、查单和看骑手。触发：叫跑腿 / 帮我寄个 X / 帮我送个东西过去 / 帮我取个 X / 跑腿到哪了 / 骑手在哪 / 取消跑腿。
 description_zh: 登录就能用：帮你叫同城跑腿取件、送件，询价后挑运力，你点头才下单；能查进度、看骑手位置，也能取消。
 description_en: "Sign in and book a same-city errand run: set pickup and drop-off, compare carriers by quote, and the order is placed only after you confirm; track progress, see the rider, or cancel."
-version: 0.2.8
+version: 0.2.9
 author: ClawDot
 ---
 
@@ -71,7 +71,4 @@ author: ClawDot
 
 ## 6. 用户的记忆
 
-- 用户说「记住 / 忘掉」，说的是下单用的口味、忌口、过敏、家人、常用地点：调 `memory` 工具（不挂 task），不要记进客户端自己的记忆或笔记。
-- 用户说「别记我 / 别再记了」：`memory` 的 `forget` 带 `stop` 为 true（已有的留着、不再用）；要连已有的一起删，再带 `all` 为 true。之后照结果里的说明告诉用户怎么恢复。
-- 用户问「你记了我什么」：凭你自己在对话里知道的回答，`memory` 工具不提供查询。要看、改、删全部记录，请用户重新授权一次，在授权完成那一页打开「我的记忆」。
-- 记过敏、家人要用户明确同意：用户只是顺口提到（「对了我对虾也过敏」），先问一句要不要记住，同意了才记。
+- 这条接入不带记忆；用户让你记住口味、忌口或过敏时，如实说这里记不住，请他下单时直接说
