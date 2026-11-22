@@ -3,7 +3,7 @@ name: local-life-errand
 description: 用户要叫跑腿（同城取件、送件）时用，还没连上任务接口也用（正文开头讲怎么先帮用户连上）。讲每一单怎么走、什么算同意下单、下单前改主意怎么回退、两单怎么确认、要退一单跑腿怎么办、查单和看骑手。触发：叫跑腿 / 帮我寄个 X / 帮我送个东西过去 / 帮我取个 X / 跑腿到哪了 / 骑手在哪 / 取消跑腿。
 description_zh: 登录就能用：帮你叫同城跑腿取件、送件，询价后挑运力，你点头才下单；能查进度、看骑手位置，也能取消。
 description_en: "Sign in and book a same-city errand run: set pickup and drop-off, compare carriers by quote, and the order is placed only after you confirm; track progress, see the rider, or cancel."
-version: 0.2.9
+version: 0.2.10
 author: ClawDot
 ---
 
@@ -65,9 +65,9 @@ author: ClawDot
 
 ## 5. 对用户说话
 
-- 不说工具名、`task_id`、`ref` 这些；说地址、物品、价钱。
+- 不说工具名、`task_id`、`ref` 这些；说地址、物品、价钱。购买方式对用户说「网上购买、快递寄来」或「附近门店买来送到」；提问、结果说明、缺货原因和建议都不用「即时零售」「电商零售」这些内部分流名。
 - 两单就说两单（「第一趟一单、第二趟一单，分开付」），不要说成一单，也不要只报一个合计让用户以为只付一次。
-- 金额只用确认页上的实付，不自己估。
+- 金额只用确认页上的实付，不自己估。解释费用时按返回的商品原价、优惠、打包费、配送费逐项说明，折后商品额另标口径，不重复扣优惠。商品单价按对应商品行金额和实际数量核对；只有用户问含费用的均摊时才折算，写清总额与分摊数量，核对算式与结果一致，不能把均摊价说成商品单价。
 
 ## 6. 用户的记忆
 

@@ -3,7 +3,7 @@ name: local-life-retail
 description: 用户要买日用百货（零售）时用，还没连上任务接口也用（正文开头讲怎么先帮用户连上）。讲每一单怎么走、什么算同意下单、一笔只买一个规格、下单前改主意怎么回退、两单怎么确认、用户说付好了怎么办、金额变了怎么办、地址和手机号怎么说、退货退款怎么办。触发：买纸巾 / 买洗衣液 / 帮我买个 X（日用品、百货）/ 我买的东西到哪了 / 要退货、退款。
 description_zh: 登录就能用：搜商品、挑规格，按真实价格出确认页，你点头才建收款单、由你自己付款；能查付款和物流，也能退货退款。
 description_en: "Sign in and buy daily essentials: search products and pick a spec, see the real price on a confirmation page; a payment link is created only after you confirm, and you pay it yourself; track payment and shipping, or request a refund."
-version: 0.2.8
+version: 0.2.9
 author: ClawDot
 ---
 
@@ -76,9 +76,9 @@ author: ClawDot
 
 ## 8. 对用户说话
 
-- 不说工具名、`task_id`、`ref` 这些；说商品名、规格、价钱。
+- 不说工具名、`task_id`、`ref` 这些；说商品名、规格、价钱。购买方式对用户说「网上购买、快递寄来」或「附近门店买来送到」；提问、结果说明、缺货原因和建议都不用「即时零售」「电商零售」这些内部分流名。
 - 两单就说两单（「纸巾一单、洗衣液一单，分开付」），不要说成一单，也不要只报一个合计让用户以为只付一次。
-- 金额只用确认页上的实付，不自己估。
+- 金额只用确认页上的实付，不自己估。解释费用时按返回的商品原价、优惠、打包费、配送费逐项说明，折后商品额另标口径，不重复扣优惠。商品单价按对应商品行金额和实际数量核对；只有用户问含费用的均摊时才折算，写清总额与分摊数量，核对算式与结果一致，不能把均摊价说成商品单价。
 
 ## 9. 用户的记忆
 
